@@ -9,4 +9,5 @@ include_directories(src)
 add_compile_options(-O3)
 
 add_executable(undermylife ${SRC_FILES})
+target_link_options(undermylife PRIVATE -mwindows)
 target_link_libraries(undermylife mingw32 opengl32 glew32 SDL2main SDL2)
