@@ -28,7 +28,9 @@ void app::core::on_update() {
 }
 
 void app::core::on_render() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    float s {glm::sin(this->m_angle)};
+
+    glClearColor(s, s, s, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::vec4 rect {};
@@ -41,19 +43,17 @@ void app::core::on_render() {
     glm::mat4 model = glm::mat4(1.0f);
 
     this->m_angle += 0.01f;
-    glm::vec3 pos {-1, -1, -1};
+    glm::vec3 pos {-1, -0.5f, -3};
 
-    model = glm::translate(model, pos + glm::vec3(1.0f));
-    model = glm::rotate(model, this->m_angle, {0, 0, 1});
-    model = glm::rotate(model, this->m_angle, {1, 0, 0});
-    model = glm::translate(model, -glm::vec3(1.0f));
+    model = glm::translate(model, pos);
+
     model = glm::scale(model, glm::vec3(2.0f));
     model = perspective * model;
 
     this->m_p_main_shader->set_uniform_mat4("uMVP", &model[0][0]);
     this->m_p_main_shader->set_uniform_vec4("uColor", &color[0]);
 
-    glPointSize(3.0F);
+    glPointSize(1.0F);
     this->m_buffer.draw();
     this->m_buffer.revoke();
 }
@@ -68,7 +68,7 @@ int32_t app::core::run() {
 
     glewExperimental = GL_TRUE;
     glewInit();
-    SDL_GL_SetSwapInterval(0);
+    SDL_GL_SetSwapInterval(1);
 
     SDL_Event sdl_event {};
     uint64_t interval {1000 / 60};
@@ -82,7 +82,7 @@ int32_t app::core::run() {
             {"./shaders/overlay.frag", GL_FRAGMENT_SHADER}
     });
 
-    glm::vec3 volume {128, 128, 128};
+    glm::vec3 volume {256, 4, 256};
     std::vector<float> vertices {};
 
     for (int32_t x = 0; x < volume.x; x++) {
@@ -103,6 +103,10 @@ int32_t app::core::run() {
     this->m_buffer.send<float>(vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     this->m_buffer.attach(0, 3, {0, 0});
     this->m_buffer.revoke();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
 
     while (this->m_mainloop) {
         while (SDL_PollEvent(&sdl_event)) {

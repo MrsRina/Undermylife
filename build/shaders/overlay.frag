@@ -2,7 +2,7 @@
 
 layout (location = 0) out vec4 vFragColor;
 
-uniform vec4 uColor;
+in vec4 vColor;
 in vec4 vRect;
 
 float rand(vec2 co) {
@@ -85,6 +85,6 @@ float noise(vec2 st) {
 }
 
 void main() {
-    float f  = noise(vec2(length((rand(vec2(-2.0f, 663.0f))) * gl_FragCoord.xy - 0.2 - vRect.xy * uColor.x)));
-    vFragColor = (vec4(sin(1.0f - f), noise(vec2(vRect - uColor.x * length(rand(vec2(-2.0f, 663.0f))))), 1.0f, 1.0f));
+    float f  = noise(vec2(length((rand(vec2(-2.0f, 663.0f))) * gl_FragCoord.xy - 0.2 - vRect.xy * vColor.x)));
+    vFragColor = (vec4(sin(1.0f - f), noise(vec2((gl_FragCoord.xy * 1.0) - vColor.x * length(rand(vec2(-2.0f, 663.0f))))), 10.0f, 1.0f)) * (1.0f / vRect.z);
 }
